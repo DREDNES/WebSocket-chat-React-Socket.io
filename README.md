@@ -8,10 +8,10 @@ Install.
 npm install
 ```
 
-Run the application
+Run the application.
 
 ``` bash
 npm start
 ```
 
-Open new clients on localhost:3000 and enjoy
+Open new clients on localhost:3000 and enjoy.
