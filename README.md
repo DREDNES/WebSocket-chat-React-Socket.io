@@ -1,4 +1,4 @@
-*Websocket based group chat app built with socket.io, react and material-ui*
+*Websocket based group chat app with multiple chatrooms built with socket.io, react*
 
 Node.js WebSocket Chat App with Socket.io and React </b></a>
 
