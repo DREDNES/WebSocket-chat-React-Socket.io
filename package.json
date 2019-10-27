@@ -2,7 +2,7 @@
   "name": "websocket-chat",
   "version": "0.0.0",
   "scripts": {
-    "server": "node ./server/server.js",
+    "start": "node ./server/server.js",
     "bundle": "webpack -p --config ./webpack.config.js",
     "client": "webpack-dev-server"
   },

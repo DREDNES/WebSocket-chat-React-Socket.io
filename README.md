@@ -11,7 +11,7 @@ npm install
 Run the application
 
 ``` bash
-npm run server
+npm start
 ```
 
 Open new clients on localhost:3000 and enjoy
