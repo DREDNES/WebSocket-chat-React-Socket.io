@@ -1,5 +1,15 @@
-const server = require('http').createServer();
+
+const express = require('express');
+const app = express();
+
+const server = require('http').Server(app);
 const io = require('socket.io')(server);
+
+server.listen(3000, function (err) {
+  if (err) throw err;
+  console.log('listening on port 3000');
+});
+app.use(express.static('./public'));
 
 const ClientManager = require('./ClientManager');
 const ChatroomManager = require('./ChatroomManager');
@@ -51,7 +61,5 @@ io.on('connection', function (client) {
   });
 });
 
-server.listen(3000, function (err) {
-  if (err) throw err;
-  console.log('listening on port 3000');
-});
+
+
