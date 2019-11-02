@@ -107,6 +107,8 @@ export default class Root extends React.Component {
         chatHistory={chatHistory}
         user={this.state.user}
         getOnlineUsers = {this.state.client.getOnlineUsers}
+        startStream = {this.state.client.startStream}
+        endStream = {this.state.client.endStream}
         onLeave={
           () => this.onLeaveChatroom(
             chatroom.name,

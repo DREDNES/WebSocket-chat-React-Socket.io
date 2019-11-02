@@ -1,15 +1,19 @@
+// const express = require('express');
+// const app = express();
 
-const express = require('express');
-const app = express();
+// const server = require('http').Server(app);
+// const io = require('socket.io')(server);
 
-const server = require('http').Server(app);
+
+
+const server = require('http').createServer();
 const io = require('socket.io')(server);
 
 server.listen(3000, function (err) {
   if (err) throw err;
   console.log('listening on port 3000');
 });
-app.use(express.static('./public'));
+//app.use(express.static('./public'));
 
 const ClientManager = require('./ClientManager');
 const ChatroomManager = require('./ChatroomManager');
@@ -23,6 +27,8 @@ io.on('connection', function (client) {
     handleRegister,
     handleJoin,
     handleLeave,
+    handleStreamStart,
+    handleStreamEnd,
     getClientId,
     handleMessage,
     handleGetChatrooms,
@@ -37,6 +43,10 @@ io.on('connection', function (client) {
   client.on('register', handleRegister);
 
   client.on('join', handleJoin);
+
+  client.on('startStream', handleStreamStart);
+
+  client.on('endStream', handleStreamEnd);
 
   client.on('leave', handleLeave);
 
@@ -60,6 +70,3 @@ io.on('connection', function (client) {
     console.log(err);
   });
 });
-
-
-

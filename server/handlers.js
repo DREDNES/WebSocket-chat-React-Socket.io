@@ -69,6 +69,34 @@ module.exports = function (client, clientManager, chatroomManager) {
       .catch(callback);
   }
 
+  function handleStreamStart(chatroomName, callback) {
+    const createEntry = () => ({ event: 'starts streaming' });
+
+    handleEvent(chatroomName, createEntry)
+      .then(function (chatroom) {
+       
+        chatroom.startStream(client);
+
+        callback(null, chatroom.getStreamer());
+
+      })
+      .catch(callback);
+  }
+
+  function handleStreamEnd(chatroomName, callback) {
+    const createEntry = () => ({ event: 'finished streaming' });
+
+    handleEvent(chatroomName, createEntry)
+      .then(function (chatroom) {
+       
+        chatroom.endStream(client);
+
+        callback(null, chatroom.getStreamer());
+
+      })
+      .catch(callback);
+  }
+
   function handleLeave(chatroomName, callback) {
     const createEntry = () => ({ event: `left ${chatroomName}` });
     handleEvent(chatroomName, createEntry)
@@ -126,6 +154,8 @@ module.exports = function (client, clientManager, chatroomManager) {
     handleGetChatrooms,
     getClientId,
     handleDisconnect,
-    handleOnlineUsers
+    handleOnlineUsers,
+    handleStreamStart, 
+    handleStreamEnd
   };
 };

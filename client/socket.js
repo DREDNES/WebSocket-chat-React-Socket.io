@@ -1,7 +1,7 @@
 const io = require('socket.io-client');
 
 export default function () {
-  const socket = io.connect('/');
+  const socket = io.connect('http://localhost:3000');
 
   function registerHandler(onMessageReceived) {
     socket.on('message', onMessageReceived);
@@ -27,6 +27,15 @@ export default function () {
   function join(chatroomName, cb) {
     socket.emit('join', chatroomName, cb);
   }
+
+  function startStream(chatroomName, cb) {
+    socket.emit('startStream', chatroomName, cb);
+  }
+
+  function endStream(chatroomName, cb) {
+    socket.emit('endStream', chatroomName, cb);
+  }
+
 
   function leave(chatroomName, cb) {
     socket.emit('leave', chatroomName, cb);
@@ -59,6 +68,8 @@ export default function () {
     registerHandler,
     getOnlineUsers,
     unregisterHandler,
+    startStream,
+    endStream
   };
 }
 

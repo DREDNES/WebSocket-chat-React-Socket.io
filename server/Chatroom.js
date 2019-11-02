@@ -1,6 +1,7 @@
 module.exports = function ({name}) {
   const members = new Map();
   let chatHistory = [];
+  let nowStreaming = null;
 
   function broadcastMessage(message) {
     members.forEach(m => m.emit('message', message));
@@ -12,6 +13,18 @@ module.exports = function ({name}) {
 
   function getChatHistory() {
     return chatHistory.slice();
+  }
+
+  function startStream(client) {
+    nowStreaming = {"id" : client.id};
+  }
+
+  function endStream(client) {
+    nowStreaming = null;
+  }
+
+  function getStreamer(){
+    return nowStreaming;
   }
 
   function addUser(client) {
@@ -39,7 +52,10 @@ module.exports = function ({name}) {
     getChatHistory,
     addUser,
     removeUser,
+    startStream,
+    endStream,
     getOnlineUsers,
+    getStreamer,
     serialize
   };
 };

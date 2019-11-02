@@ -4,7 +4,10 @@ import FlatButton from 'material-ui/FlatButton';
 import FontIcon from 'material-ui/FontIcon';
 import { List, ListItem } from 'material-ui/List';
 import OnlineUsers from './OnlineUsers';
+import VideoContainer from './VideoContainer';
 import Send from 'material-ui/svg-icons/content/send';
+import StreamOn from 'material-ui/svg-icons/Av/videocam';
+import StreamOff from 'material-ui/svg-icons/Av/videocam-off';
 
 
 const ChatWindow = styled.div`
@@ -124,6 +127,11 @@ const SendButton = styled.button`
   }
 `;
 
+const HeaderButtonsWrap = styled.div`
+  display: inline-block;
+  margin: 0 10px;
+`;
+
 export default class Chatroom extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -133,10 +141,12 @@ export default class Chatroom extends React.Component {
     this.state = {
       chatHistory,
       input: '',
-      onlineUsers: null
+      onlineUsers: null,
+      streamer: null
     };
 
     this.onInput = this.onInput.bind(this);
+    this.toogleStream = this.toogleStream.bind(this);
     this.onSendMessage = this.onSendMessage.bind(this);
     this.onMessageReceived = this.onMessageReceived.bind(this);
     this.updateChatHistory = this.updateChatHistory.bind(this);
@@ -183,7 +193,7 @@ export default class Chatroom extends React.Component {
   onMessageReceived(entry) {
     console.log('onMessageReceived:', entry);
     this.updateChatHistory(entry);
-    if (entry.event) {
+    if (entry.event.includes('joined' || 'left')) {
       this.getOnlineUsers();
     }
   }
@@ -194,6 +204,32 @@ export default class Chatroom extends React.Component {
 
   scrollChatToBottom() {
     this.panel.scrollTo(0, this.panel.scrollHeight);
+  }
+  
+  toogleStream() {
+    if(this.state.streamer) {
+      this.onStreamEnded();
+    } else {
+      this.onStreamStarted();
+    }
+  }
+
+  onStreamEnded() {
+    this.props.endStream(this.props.chatroom.name, (err, streamer) => {
+      if (err)
+        return console.error(err);
+      return this.setState({ streamer });
+    });
+  }
+
+  onStreamStarted() {
+
+    this.props.startStream(this.props.chatroom.name, (err, streamer) => {
+      if (err)
+        return console.error(err);
+      return this.setState({ streamer });
+    });
+
   }
 
   renderMessage(user, message, i, event ,time) {
@@ -263,6 +299,18 @@ export default class Chatroom extends React.Component {
             <Title>
               { this.props.chatroom.name }
             </Title>
+            <div>
+            <HeaderButtonsWrap>
+            <FlatButton
+              default
+              backgroundColor='rgba(242, 242, 242, 0.5)'
+              icon={
+                this.state.streamer ? <StreamOff color = '#fafafa'/> : <StreamOn color = '#fafafa'/> 
+              }
+              onClick={this.toogleStream}
+            />
+             </HeaderButtonsWrap>
+             <HeaderButtonsWrap>
             <FlatButton
               default
               backgroundColor='rgba(242, 242, 242, 0.5)'
@@ -276,8 +324,11 @@ export default class Chatroom extends React.Component {
               }
               onClick={this.props.onLeave}
             />
+            </HeaderButtonsWrap>
+            </div>
           </Header>
           <ChatPanel>
+            {this.state.streamer ? <VideoContainer/> : ''}
             <Scrollable innerRef={(panel) => { this.panel = panel; }}>
               <List>
                 {
