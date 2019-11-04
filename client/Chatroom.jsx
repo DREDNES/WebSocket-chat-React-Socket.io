@@ -5,6 +5,7 @@ import FontIcon from 'material-ui/FontIcon';
 import { List, ListItem } from 'material-ui/List';
 import OnlineUsers from './OnlineUsers';
 import VideoContainer from './VideoContainer';
+import Video from './Video';
 import Send from 'material-ui/svg-icons/content/send';
 import StreamOn from 'material-ui/svg-icons/Av/videocam';
 import StreamOff from 'material-ui/svg-icons/Av/videocam-off';
@@ -142,7 +143,10 @@ export default class Chatroom extends React.Component {
       chatHistory,
       input: '',
       onlineUsers: null,
-      streamer: null
+      streamer: null,
+      streaming: false,
+      streamerLoaded: false,
+      streamerBool: false
     };
 
     this.onInput = this.onInput.bind(this);
@@ -153,6 +157,16 @@ export default class Chatroom extends React.Component {
     this.scrollChatToBottom = this.scrollChatToBottom.bind(this);
 
     this.getOnlineUsers();
+    this.getStreamingState();
+
+  }
+
+
+  getStreamingState(){
+    if(this.props.getStreamer(this.props.chatroom.name,  (err, streamer) => {
+      if(err) console.error(err);
+      this.setState({ streaming:  streamer ? true : false});
+    }));
   }
 
   getOnlineUsers() {
@@ -164,6 +178,7 @@ export default class Chatroom extends React.Component {
 
   componentDidMount() {
     this.props.registerHandler(this.onMessageReceived);
+
     this.scrollChatToBottom();
   }
 
@@ -193,9 +208,14 @@ export default class Chatroom extends React.Component {
   onMessageReceived(entry) {
     console.log('onMessageReceived:', entry);
     this.updateChatHistory(entry);
-    if (entry.event.includes('joined' || 'left')) {
+    if (entry.event) {
+      if (entry.event.includes('joined') || (entry.event.includes('left'))) {
       this.getOnlineUsers();
-    }
+      } else {
+        if(entry.event.includes('starts')) this.openVideo();
+        else this.closeVideo();
+      }
+    } 
   }
 
   updateChatHistory(entry) {
@@ -207,29 +227,41 @@ export default class Chatroom extends React.Component {
   }
   
   toogleStream() {
-    if(this.state.streamer) {
-      this.onStreamEnded();
+    if(this.state.streaming) {
+      this.finishStream();
     } else {
-      this.onStreamStarted();
+      this.startStream();
     }
   }
 
-  onStreamEnded() {
+  finishStream() {
+
     this.props.endStream(this.props.chatroom.name, (err, streamer) => {
       if (err)
         return console.error(err);
-      return this.setState({ streamer });
+      return this.setState({ streamer, streaming:false });
     });
   }
 
-  onStreamStarted() {
-
+  startStream() {
+    this.setState({streamerBool:true});
     this.props.startStream(this.props.chatroom.name, (err, streamer) => {
       if (err)
         return console.error(err);
-      return this.setState({ streamer });
+       this.setState({ streamer, streaming : true }, ()=>this.setState({streamerLoaded: true}));
     });
+  }
 
+  openVideo(){
+    this.setState({ streaming: true });
+  }
+
+  closeVideo(){
+    this.setState({ streaming: false });
+  }
+
+  renderVideo() {
+      return <Video chatroom = {this.props.chatroom.name} initiator = {this.state.streamerBool}/>
   }
 
   renderMessage(user, message, i, event ,time) {
@@ -287,6 +319,7 @@ export default class Chatroom extends React.Component {
   }
 
   render() {
+  
     return (
       <div style={{ height: '90%', marginTop: 20 }}>
         {
@@ -328,7 +361,7 @@ export default class Chatroom extends React.Component {
             </div>
           </Header>
           <ChatPanel>
-            {this.state.streamer ? <VideoContainer/> : ''}
+            {this.state.streaming ? this.renderVideo() : ''}
             <Scrollable innerRef={(panel) => { this.panel = panel; }}>
               <List>
                 {

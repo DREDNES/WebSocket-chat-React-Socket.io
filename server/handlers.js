@@ -69,9 +69,12 @@ module.exports = function (client, clientManager, chatroomManager) {
       .catch(callback);
   }
 
+  function getStreamer(chatroomName, callback) {
+    return  callback(null, chatroomManager.getChatroomByName(chatroomName).getStreamer());
+  }
+
   function handleStreamStart(chatroomName, callback) {
     const createEntry = () => ({ event: 'starts streaming' });
-
     handleEvent(chatroomName, createEntry)
       .then(function (chatroom) {
        
@@ -85,7 +88,6 @@ module.exports = function (client, clientManager, chatroomManager) {
 
   function handleStreamEnd(chatroomName, callback) {
     const createEntry = () => ({ event: 'finished streaming' });
-
     handleEvent(chatroomName, createEntry)
       .then(function (chatroom) {
        
@@ -116,6 +118,18 @@ module.exports = function (client, clientManager, chatroomManager) {
                                          .getOnlineUsers()
                                          .map(clientId => clientManager.getUserByClientId(clientId)));
 
+  }
+
+  function handleGetSignals(chatroomName, callback) {
+    return callback(null, chatroomManager.getChatroomByName(chatroomName)
+                                         .getSignals());
+
+  }
+
+  function handleAddSignal(chatroomName, signal, callback) {
+    console.log("HI");
+   
+    chatroomManager.getChatroomByName(chatroomName).addSignal(signal);
   }
 
   function handleMessage({ chatroomName, message, time } = {}, callback) {
@@ -156,6 +170,9 @@ module.exports = function (client, clientManager, chatroomManager) {
     handleDisconnect,
     handleOnlineUsers,
     handleStreamStart, 
-    handleStreamEnd
+    handleStreamEnd,
+    handleGetSignals,
+    handleAddSignal,
+    getStreamer
   };
 };

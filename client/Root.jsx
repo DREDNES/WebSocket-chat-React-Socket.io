@@ -22,7 +22,7 @@ export default class Root extends React.Component {
       isRegisterInProcess: false,
       client: socket(),
       chatrooms: null,
-      clientId: ''
+      clientId: '',
     };
 
     this.onEnterChatroom = this.onEnterChatroom.bind(this);
@@ -100,6 +100,7 @@ export default class Root extends React.Component {
     }
 
     const { chatHistory } = history.location.state;
+    
 
     return (
       <Chatroom
@@ -109,6 +110,7 @@ export default class Root extends React.Component {
         getOnlineUsers = {this.state.client.getOnlineUsers}
         startStream = {this.state.client.startStream}
         endStream = {this.state.client.endStream}
+        getStreamer = {this.state.client.getStreamer}
         onLeave={
           () => this.onLeaveChatroom(
             chatroom.name,

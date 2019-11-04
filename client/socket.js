@@ -11,10 +11,26 @@ export default function () {
     socket.off('message');
   }
 
+  function registerSignal(setSignal) {
+    socket.on('gotSignal', setSignal);
+  }
+
+  function unregisterSignal() {
+    socket.off('gotSignal');
+  }
+  
   socket.on('error', function (err) {
     console.log('received socket error:');
     console.log(err);
   });
+
+  function sendSignal(chatroomName, signal, cb) {
+    socket.emit('signal', chatroomName, signal, cb);
+  }
+
+  function getSignals(chatroomName, cb) {
+    socket.emit('getSignals', chatroomName, cb);
+  }
 
   function register(name, cb) {
     socket.emit('register', name, cb);
@@ -28,6 +44,10 @@ export default function () {
     socket.emit('join', chatroomName, cb);
   }
 
+  function getStreamer(chatroomName, cb) {
+    socket.emit('getStreamer', chatroomName, cb);
+  }
+
   function startStream(chatroomName, cb) {
     socket.emit('startStream', chatroomName, cb);
   }
@@ -35,7 +55,6 @@ export default function () {
   function endStream(chatroomName, cb) {
     socket.emit('endStream', chatroomName, cb);
   }
-
 
   function leave(chatroomName, cb) {
     socket.emit('leave', chatroomName, cb);
@@ -69,7 +88,12 @@ export default function () {
     getOnlineUsers,
     unregisterHandler,
     startStream,
-    endStream
+    endStream,
+    sendSignal,
+    getSignals,
+    registerSignal,
+    getStreamer,
+    unregisterSignal
   };
 }
 

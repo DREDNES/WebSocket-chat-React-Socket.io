@@ -34,7 +34,10 @@ io.on('connection', function (client) {
     handleGetChatrooms,
     handleOnlineUsers,
     handleAddChatroom,
-    handleDisconnect
+    handleDisconnect,
+    handleAddSignal,
+    handleGetSignals,
+    getStreamer
   } = makeHandlers(client, clientManager, chatroomManager);
 
   console.log('client connected...', client.id);
@@ -48,7 +51,15 @@ io.on('connection', function (client) {
 
   client.on('endStream', handleStreamEnd);
 
+  client.on('getStreamer', getStreamer);
+
   client.on('leave', handleLeave);
+
+  client.on('signal', (name, signal)=>{
+    io.emit('gotSignal', signal);
+  });
+
+  client.on('getSignals', handleGetSignals);
 
   client.on('getClientId', getClientId);
 

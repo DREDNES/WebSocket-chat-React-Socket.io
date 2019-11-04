@@ -1,7 +1,8 @@
 module.exports = function ({name}) {
   const members = new Map();
   let chatHistory = [];
-  let nowStreaming = null;
+  let streamer = null;
+  let signals = [];
 
   function broadcastMessage(message) {
     members.forEach(m => m.emit('message', message));
@@ -16,19 +17,28 @@ module.exports = function ({name}) {
   }
 
   function startStream(client) {
-    nowStreaming = {"id" : client.id};
+    streamer = client.id;
   }
 
   function endStream(client) {
-    nowStreaming = null;
+    streamer = null;
+    signals = [];
   }
 
   function getStreamer(){
-    return nowStreaming;
+    return streamer;
   }
 
   function addUser(client) {
     members.set(client.id, client);
+  }
+
+  function addSignal(signal) {
+    signals.push(signal);
+  }
+
+  function getSignals(){
+    return signals;
   }
 
   function removeUser(client) {
@@ -42,7 +52,8 @@ module.exports = function ({name}) {
   function serialize() {
     return {
       name,
-      numMembers: members.size
+      numMembers: members.size,
+      streaming: streamer ? true : false
     };
   }
 
@@ -56,6 +67,8 @@ module.exports = function ({name}) {
     endStream,
     getOnlineUsers,
     getStreamer,
-    serialize
+    serialize,
+    addSignal,
+    getSignals
   };
 };

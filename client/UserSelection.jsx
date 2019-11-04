@@ -57,11 +57,11 @@ export default class UserSelection extends React.Component {
 
   
   onConfirm() {
-    if(this.state.inputName != ''){
+    if(this.state.inputName != '' && !this.state.inputName.includes('/')){
       const name = `{ "id":"${this.props.clientId}", "name": "${this.state.inputName}", "lastName": "${this.state.inputLastname}" }`;
       this.props.register(name);
     } else {
-      alert ("Enter at least your name!");
+      alert ("Check your name!");
     }
   }
 
