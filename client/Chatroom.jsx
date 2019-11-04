@@ -4,7 +4,6 @@ import FlatButton from 'material-ui/FlatButton';
 import FontIcon from 'material-ui/FontIcon';
 import { List, ListItem } from 'material-ui/List';
 import OnlineUsers from './OnlineUsers';
-import VideoContainer from './VideoContainer';
 import Video from './Video';
 import Send from 'material-ui/svg-icons/content/send';
 import StreamOn from 'material-ui/svg-icons/Av/videocam';
@@ -257,7 +256,7 @@ export default class Chatroom extends React.Component {
   }
 
   closeVideo(){
-    this.setState({ streaming: false });
+    this.setState({ streaming: false, streamerLoaded: false, streamerBool: false });
   }
 
   renderVideo() {
