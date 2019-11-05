@@ -1,23 +1,19 @@
-*Websocket based group chat app with multiple chatrooms built with socket.io, react*
+# Websocket based group chat app with multiple chatrooms built with socket.io, react, simple-peer
 
-Node.js WebSocket Chat App with Socket.io and React </b></a>
+*Video stream works only when 2 clients are in the room (bug, need fix)*
 
-Install.
-
+Installation instruction
+=====================
+1. Install.
 ``` bash
 npm install
 ```
-
-Run the application server.
-
+2. Run the application server.
 ``` bash
 npm start
 ```
-
-Run the client.
-
+3. Run the client.
 ``` bash
 npm run client
 ```
-
-Open new clients on localhost:3001.
+4. Open new clients on localhost:3001.
