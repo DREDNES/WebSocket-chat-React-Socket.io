@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import socket from './socket';
 import Peer from 'simple-peer';
+import { ClientRequest } from 'http';
 
 
 //const io = require('socket.io-client');
@@ -46,6 +47,7 @@ export default class Video extends React.Component {
     this.onStream = this.onStream.bind(this);
     this.onError = this.onError.bind(this);
 
+    this.clients = [];
     this.stream = null;
   }
 
@@ -71,18 +73,25 @@ export default class Video extends React.Component {
 
   componentDidMount() {
     this.state.client.registerSignal( (signal)=>{
-      console.log("I GOT SIGNAL", signal);
       if(signal.id !== this.peer._id) {
-        this.signal(signal.signal);
+      
+        if(signal.initiator && !this.props.initiator) {
+          this.signal(signal.signal); console.log("I GOT SIGNAL", signal);
+        }
+        else if(this.props.initiator && !signal.initiator) {
+          if(!this.clients.includes(signal.id)) this.clients.push(signal.id);
+          this.signal(signal.signal); console.log("I GOT SIGNAL", signal);
+        }
       }
     });
 
     if(this.props.initiator) {
     const gotMedia = stream => {
+      console.log(this.clients);
 
       this.stream = stream;
       this.peer.addStream(stream);
-            
+
       var video = document.querySelector('video');
         if ('srcObject' in video) {
           video.srcObject = stream;
@@ -108,7 +117,10 @@ export default class Video extends React.Component {
   }
 
   onSignal(data) {
-    this.state.client.sendSignal(this.props.chatroom, {"id":this.peer._id, "signal": data});
+    if(this.clients) {
+
+    }
+    this.state.client.sendSignal(this.props.chatroom, {'id':this.peer._id, 'initiator':this.props.initiator, 'signal': data});
   }
 
   onData(data) {
@@ -131,14 +143,24 @@ export default class Video extends React.Component {
   }
 
   onError(err) {
-    console.log(err);
+    console.log('PEER ERROR', err);
   }
 
   
 
+
   render() {
     return (
-        <VideoWrapper> <video height="100%" autoPlay="true" muted = {this.props.initiator}></video></VideoWrapper>
+        <VideoWrapper>
+          <div dangerouslySetInnerHTML={{ __html: `
+        <video 
+        height="100%" 
+        autoPlay="true"
+        muted = ${this.props.initiator} 
+         />,
+      ` }}></div>
+           
+        </VideoWrapper>
     )
   }
 }

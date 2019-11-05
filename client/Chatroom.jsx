@@ -209,7 +209,7 @@ export default class Chatroom extends React.Component {
     this.updateChatHistory(entry);
     if (entry.event) {
       if (entry.event.includes('joined') || (entry.event.includes('left'))) {
-      this.getOnlineUsers();
+        this.getOnlineUsers();
       } else {
         if(entry.event.includes('starts')) this.openVideo();
         else this.closeVideo();
@@ -354,7 +354,7 @@ export default class Chatroom extends React.Component {
                   {'close'}
                 </FontIcon>
               }
-              onClick={this.props.onLeave}
+              onClick={() => { if(this.state.streamerBool) {this.finishStream();} this.props.onLeave();}}
             />
             </HeaderButtonsWrap>
             </div>
@@ -381,7 +381,7 @@ export default class Chatroom extends React.Component {
                 textareaStyle={{ color: '#fafafa' }}
                 hintStyle={{ color: '#fafafa' }}
                 floatingLabelStyle={{ color: '#fafafa' }}
-              
+                display = {!this.state.streaming || (this.state.streaming && this.state.streamerBool) ? 'block' : 'none'}
                 floatingLabelText="Enter a message."
                 multiLine
                 rows={3}

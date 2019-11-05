@@ -15,7 +15,12 @@ module.exports = function () {
   }
 
   function removeClient(client) {
-    chatrooms.forEach(c => c.removeUser(client));
+    chatrooms.forEach(c => {
+      if(c.getStreamer() == client.id) {
+        c.endStream();
+      }
+      c.removeUser(client);
+    });
   }
 
   function addChatroom(name) {
