@@ -2,8 +2,8 @@
 
 *Video stream works only when 2 clients are in the room (bug, need fix)*
 
-Installation instruction
-=====================
+## Installation instruction
+
 1. Install.
 ``` bash
 npm install
