@@ -1,8 +1,8 @@
 const io = require('socket.io-client');
 
-export default function () {
-  const socket = io.connect('http://localhost:3000');
-
+export default function() {
+  const socket = io();
+  
   function registerHandler(onMessageReceived) {
     socket.on('message', onMessageReceived);
   }
@@ -11,26 +11,10 @@ export default function () {
     socket.off('message');
   }
 
-  function registerSignal(setSignal) {
-    socket.on('gotSignal', setSignal);
-  }
-
-  function unregisterSignal() {
-    socket.off('gotSignal');
-  }
-  
-  socket.on('error', function (err) {
+  socket.on('error', err => {
     console.log('received socket error:');
     console.log(err);
   });
-
-  function sendSignal(chatroomName, signal, cb) {
-    socket.emit('signal', chatroomName, signal, cb);
-  }
-
-  function getSignals(chatroomName, cb) {
-    socket.emit('getSignals', chatroomName, cb);
-  }
 
   function register(name, cb) {
     socket.emit('register', name, cb);
@@ -42,18 +26,6 @@ export default function () {
 
   function join(chatroomName, cb) {
     socket.emit('join', chatroomName, cb);
-  }
-
-  function getStreamer(chatroomName, cb) {
-    socket.emit('getStreamer', chatroomName, cb);
-  }
-
-  function startStream(chatroomName, cb) {
-    socket.emit('startStream', chatroomName, cb);
-  }
-
-  function endStream(chatroomName, cb) {
-    socket.emit('endStream', chatroomName, cb);
   }
 
   function leave(chatroomName, cb) {
@@ -86,14 +58,6 @@ export default function () {
     getClientId,
     registerHandler,
     getOnlineUsers,
-    unregisterHandler,
-    startStream,
-    endStream,
-    sendSignal,
-    getSignals,
-    registerSignal,
-    getStreamer,
-    unregisterSignal
+    unregisterHandler
   };
 }
-

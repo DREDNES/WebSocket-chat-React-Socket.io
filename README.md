@@ -1,8 +1,8 @@
-# Websocket based group chat app with multiple chatrooms built with socket.io, react, simple-peer
+# Websocket based group chat app with multiple chatrooms built with socket.io, react
 
-*Video stream works only when 2 clients are in the room (bug, need fix)*
+Run live demo [here](https://drednes.github.io/demo/webcam-selfie/)
 
-## Installation instruction
+# Installation instruction
 
 1. Install.
 ``` bash
@@ -12,8 +12,4 @@ npm install
 ``` bash
 npm start
 ```
-3. Run the client.
-``` bash
-npm run client
-```
-4. Open new clients on localhost:3001.
+3. Open new clients on localhost:3000.

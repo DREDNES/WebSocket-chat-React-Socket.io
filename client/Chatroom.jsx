@@ -2,12 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import FlatButton from 'material-ui/FlatButton';
 import FontIcon from 'material-ui/FontIcon';
+import Send from 'material-ui/svg-icons/content/send';
 import { List, ListItem } from 'material-ui/List';
 import OnlineUsers from './OnlineUsers';
-import Video from './Video';
-import Send from 'material-ui/svg-icons/content/send';
-import StreamOn from 'material-ui/svg-icons/Av/videocam';
-import StreamOff from 'material-ui/svg-icons/Av/videocam-off';
 
 const ChatWindow = styled.div`
   position: relative;
@@ -139,31 +136,16 @@ export default class Chatroom extends React.Component {
     this.state = {
       chatHistory,
       input: '',
-      onlineUsers: null,
-      streamer: null,
-      streaming: false,
-      streamerLoaded: false,
-      streamerBool: false
+      onlineUsers: null
     };
 
     this.onInput = this.onInput.bind(this);
-    this.toogleStream = this.toogleStream.bind(this);
     this.onSendMessage = this.onSendMessage.bind(this);
-    this.onMessageReceived = this.onMessageReceived.bind(this);
     this.updateChatHistory = this.updateChatHistory.bind(this);
+    this.onMessageReceived = this.onMessageReceived.bind(this);
     this.scrollChatToBottom = this.scrollChatToBottom.bind(this);
 
     this.getOnlineUsers();
-    this.getStreamingState();
-  }
-
-  getStreamingState() {
-    if (
-      this.props.getStreamer(this.props.chatroom.name, (err, streamer) => {
-        if (err) console.error(err);
-        this.setState({ streaming: streamer ? true : false });
-      })
-    );
   }
 
   getOnlineUsers() {
@@ -197,9 +179,7 @@ export default class Chatroom extends React.Component {
     if (!this.state.input) return;
     this.props.onSendMessage(
       this.state.input,
-      Date().match(
-        /([a-zA-Z]{3}\s\d{2}\s\d{4}\s)([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])/
-      )[0],
+      Date().match(/([a-zA-Z]{3}\s\d{2}\s\d{4}\s)([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])/)[0],
       err => {
         if (err) return console.error(err);
         return this.setState({ input: '' });
@@ -213,10 +193,8 @@ export default class Chatroom extends React.Component {
     if (entry.event) {
       if (entry.event.includes('joined') || entry.event.includes('left')) {
         this.getOnlineUsers();
-      } else {
-        if (entry.event.includes('starts')) this.openVideo();
-        else this.closeVideo();
-      }
+      } else if (entry.event.includes('starts')) this.openVideo();
+      else this.closeVideo();
     }
   }
 
@@ -234,45 +212,6 @@ export default class Chatroom extends React.Component {
     } else {
       this.startStream();
     }
-  }
-
-  finishStream() {
-    this.props.endStream(this.props.chatroom.name, (err, streamer) => {
-      if (err) return console.error(err);
-      return this.setState({ streamer, streaming: false });
-    });
-  }
-
-  startStream() {
-    this.setState({ streamerBool: true });
-    this.props.startStream(this.props.chatroom.name, (err, streamer) => {
-      if (err) return console.error(err);
-      this.setState({ streamer, streaming: true }, () =>
-        this.setState({ streamerLoaded: true })
-      );
-    });
-  }
-
-  openVideo() {
-    this.setState({ streaming: true });
-  }
-
-  closeVideo() {
-    this.setState({
-      streaming: false,
-      streamerLoaded: false,
-      streamerBool: false
-    });
-  }
-
-  renderVideo() {
-    return (
-      <Video
-        chatroom={this.props.chatroom.name}
-        user={this.props.user.id}
-        initiator={this.state.streamerBool}
-      />
-    );
   }
 
   renderMessage(user, message, i, event, time) {
@@ -314,90 +253,58 @@ export default class Chatroom extends React.Component {
             </ListItemWrap>
           }
           secondaryText={
-            <div
-              style={{ textAlign: 'left', color: 'rgba(242, 242, 242, 0.5)' }}
-            >
-              {time}
-            </div>
-          }
-        />
-      );
-    } else {
-      return (
-        <ListItem
-          key={i}
-          style={{
-            color: '#fafafa',
-            display: 'flex',
-            justifyContent: 'flex-start'
-          }}
-          primaryText={
-            <ListItemWrap>
-              {user.name}
-              <MessageWrap>
-                <OutputText>{message}</OutputText>
-              </MessageWrap>
-            </ListItemWrap>
-          }
-          secondaryText={
-            <div
-              style={{ textAlign: 'right', color: 'rgba(242, 242, 242, 0.5)' }}
-            >
-              {time}
-            </div>
+            <div style={{ textAlign: 'left', color: 'rgba(242, 242, 242, 0.5)' }}>{time}</div>
           }
         />
       );
     }
+    return (
+      <ListItem
+        key={i}
+        style={{
+          color: '#fafafa',
+          display: 'flex',
+          justifyContent: 'flex-start'
+        }}
+        primaryText={
+          <ListItemWrap>
+            {user.name}
+            <MessageWrap>
+              <OutputText>{message}</OutputText>
+            </MessageWrap>
+          </ListItemWrap>
+        }
+        secondaryText={
+          <div style={{ textAlign: 'right', color: 'rgba(242, 242, 242, 0.5)' }}>{time}</div>
+        }
+      />
+    );
   }
 
   render() {
     return (
       <div style={{ height: '90%', marginTop: 20 }}>
-        {this.state.onlineUsers ? (
-          <OnlineUsers users={this.state.onlineUsers} />
-        ) : (
-          ''
-        )}
+        {this.state.onlineUsers ? <OnlineUsers users={this.state.onlineUsers} /> : ''}
         <ChatWindow>
           <Header>
             <Title>{this.props.chatroom.name}</Title>
-            <div>
-              <HeaderButtonsWrap>
-                <FlatButton
-                  default
-                  backgroundColor="rgba(242, 242, 242, 0.5)"
-                  icon={
-                    this.state.streamer ? (
-                      <StreamOff color="#fafafa" />
-                    ) : (
-                      <StreamOn color="#fafafa" />
-                    )
+            <HeaderButtonsWrap>
+              <FlatButton
+                default
+                backgroundColor='rgba(242, 242, 242, 0.5)'
+                icon={
+                  <FontIcon style={{ fontSize: 24, color: '#fafafa' }} className='material-icons'>
+                    {'close'}
+                  </FontIcon>
+                }
+                onClick={() => {
+                  if (this.state.streamerBool) {
+                    this.finishStream();
                   }
-                  onClick={this.toogleStream}
-                />
-              </HeaderButtonsWrap>
-              <HeaderButtonsWrap>
-                <FlatButton
-                  default
-                  backgroundColor="rgba(242, 242, 242, 0.5)"
-                  icon={
-                    <FontIcon
-                      style={{ fontSize: 24, color: '#fafafa' }}
-                      className="material-icons"
-                    >
-                      {'close'}
-                    </FontIcon>
-                  }
-                  onClick={() => {
-                    if (this.state.streamerBool) {
-                      this.finishStream();
-                    }
-                    this.props.onLeave();
-                  }}
-                />
-              </HeaderButtonsWrap>
-            </div>
+                  this.props.onLeave();
+                }}
+              />
+            </HeaderButtonsWrap>
           </Header>
           <ChatPanel>
             {this.state.streaming ? this.renderVideo() : ''}
@@ -407,13 +314,9 @@ export default class Chatroom extends React.Component {
               }}
             >
               <List>
-                {this.state.chatHistory.map(
-                  ({ user, message, time, event }, i) => [
-                    <NoDots>
-                      {this.renderMessage(user, message, i, event, time)}
-                    </NoDots>
-                  ]
-                )}
+                {this.state.chatHistory.map(({ user, message, time, event }, i) => [
+                  <NoDots>{this.renderMessage(user, message, i, event, time)}</NoDots>
+                ])}
               </List>
             </Scrollable>
             <InputPanelWrap>
@@ -423,20 +326,17 @@ export default class Chatroom extends React.Component {
                 hintStyle={{ color: '#fafafa' }}
                 floatingLabelStyle={{ color: '#fafafa' }}
                 display={
-                  !this.state.streaming ||
-                  (this.state.streaming && this.state.streamerBool)
+                  !this.state.streaming || (this.state.streaming && this.state.streamerBool)
                     ? 'block'
                     : 'none'
                 }
-                floatingLabelText="Enter a message."
+                floatingLabelText='Enter a message.'
                 multiLine
                 rows={3}
                 rowsMax={4}
                 onChange={this.onInput}
                 value={this.state.input}
-                onKeyPress={e =>
-                  e.key === 'Enter' ? this.onSendMessage() : null
-                }
+                onKeyPress={e => (e.key === 'Enter' ? this.onSendMessage() : null)}
               />
               <SendButton
                 onClick={this.onSendMessage}
@@ -448,7 +348,7 @@ export default class Chatroom extends React.Component {
                   justifyContent: 'center'
                 }}
               >
-                <Send style={{ height: '40', width: '40' }} color="#fafafa" />
+                <Send style={{ height: '40', width: '40' }} color='#fafafa' />
               </SendButton>
             </InputPanelWrap>
           </ChatPanel>
