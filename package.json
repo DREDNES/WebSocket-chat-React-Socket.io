@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "start": "node ./server/server.js",
+    "heroku-postbuild": "webpack -p",
     "bundle": "webpack -p --config ./webpack.config.js",
     "client": "webpack-dev-server"
   },
