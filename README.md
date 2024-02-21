@@ -1,7 +1,5 @@
 # Websocket based group chat app with multiple chatrooms built with socket.io, react
 
-Run live demo [here](https://multiple-group-chat.herokuapp.com)
-
 # Installation instruction
 
 1. Install.
